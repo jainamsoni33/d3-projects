@@ -1,0 +1,23 @@
+.dropdown-div {
+    padding-top: 30;
+    
+}
+
+#dropdown {
+    font-size: x-large;   
+}
+
+#header {
+    background-color: #242582;
+}
+
+h1 {
+    text-align: center;
+    color: #fff;
+}
+
+#pSlider {
+    text-align: center;
+    position: relative;
+    top: 2px;
+}
