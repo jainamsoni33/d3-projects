@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/bootstrap.min.css') }}">
+
+        <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='d3/d3.v4.min.js') }}"></script>
+
+        <style>
+
+            .line {
+                fill: none;
+                stroke: #000;
+                stroke-width: 2;
+            }
+
+            .bar {
+                fill: #69b3a2
+            }
+
+            .nav ul {
+                width: 100%  
+            }
+
+            .nav ul li {
+                margin: 3%;
+                width: 14%;
+            }
+
+            .axis,
+            .frame {
+            shape-rendering: crispEdges;
+            }
+
+            .axis line {
+            stroke: #ddd;
+            }
+
+            .axis path {
+            display: none;
+            }
+
+            .cell text {
+            font-weight: bold;
+            text-transform: capitalize;
+            fill: black;
+            }
+
+            .frame {
+            fill: none;
+            stroke: #aaa;
+            }
+
+            circle {
+            fill-opacity: .7;
+            }
+
+            circle.hidden {
+            fill: #ccc !important;
+            }
+
+            .extent {
+            fill: #000;
+            fill-opacity: .125;
+            stroke: #fff;
+            }
+
+        </style>
+    
+    </head>
+
+    <body>
+        <div class="container-fluid">
+            <br>
+            <h4>
+                Housing Prices - Project 2
+            </h4>
+            <div id="accordion">
+                <div class="card" id="task12">
+                    <div class="card-header">
+                        <a class="collapsed card-link" data-toggle="collapse" href="#collapseOne">
+                            <i class="fa fa-angle-down rotate-icon"></i> &nbsp;Task 1 & 2: Generate samples and plot Scree Plots
+                        </a>
+                    </div>
+                    <div id="collapseOne" class="collapse" data-parent="#accordion">
+                        <div class="card-body">
+                                <h5>
+                                   &nbsp; &nbsp; Click on one tab to see the corresponding Scree Plot
+                                </h5>
+                                <ul class="nav nav-tabs">
+                                    <li class="col-md-4">
+                                        <a class="nav-link" href="#" id="t1_whole_dataset">Whole dataset</a>
+                                    </li>
+                                    <li class="col-md-4">
+                                        <a class="nav-link" href="#" id="t1_random_sample">Random Sampling</a>
+                                    </li>
+                                    <li class="col-md-4">
+                                        <a class="nav-link" href="#" id="t1_stratified_sample">Stratified Sampling</a>
+                                    </li>
+                                  </ul>            
+                            <div class="row" id="row1">
+            
+                                <div class="col-md-6" id="r1c1">
+                                    <svg width="500" height="500">
+                
+                                    </svg>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                </div>
+                            
+                            </div>
+            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="task31">
+                    <div class="card-header">
+                        <a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
+                            <i class="fa fa-angle-down rotate-icon"></i> &nbsp;Task 3: Show Scatter Plots
+                        </a>
+                    </div>
+                    <div id="collapseTwo" class="collapse">
+                        <div class="card-body">
+                            <div class="col-md-12">
+                                <h5>
+                                   &nbsp; &nbsp; Click on one tab to see the corresponding Scatter Plots
+                                </h5>
+                                <ul class="nav nav-tabs">
+                                    <li class="col-md-3">
+                                        <a class="nav-link" href="#" id="t3_top_2_pca">&nbsp;Top 2 PCA</a>
+                                    </li>
+                                    <li class="col-md-3">
+                                        <a class="nav-link" href="#" id="t3_mds_euclidean">&nbsp;MDS with Euclidean</a>
+                                    </li>
+                                    <li class="col-md-3">
+                                        <a class="nav-link" href="#" id="t3_mds_correlation">&nbsp;MDS with Correlation</a>
+                                    </li>
+                                  </ul>
+                            </div>
+
+                            <div class="row" id="row2">
+            
+                                <div class="col-md-4" id="r2c1">
+                                    <svg width="500" height="500">
+                
+                                    </svg>
+                                </div>
+                                
+                                <div class="col-md-4" id="r2c2">
+                                    <svg width="500" height="500">
+                
+                                    </svg>
+                                </div>
+                                
+                                <div class="col-md-4" id="r2c3">
+                                    <svg width="500" height="500">
+                
+                                    </svg>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="task32">
+                    <div class="card-header">
+                        <a class="collapsed card-link" data-toggle="collapse" href="#collapseThree">
+                            <i class="fa fa-angle-down rotate-icon"></i> &nbsp;Task 3: Show Scatter Plot Matrix
+                        </a>
+                    </div>
+                    <div id="collapseThree" class="collapse">
+                        <div class="card-body">
+                                <h5>
+                                   Click on one tab to see the corresponding Scatter Plot Matrix
+                                </h5>
+                                <ul class="nav nav-tabs">
+                                    <li class="col-md-4">
+                                        <a class="nav-link" href="#" id="t3_ScatterPlotMatrix_whole">Whole dataset</a>
+                                    </li>
+                                    <li class="col-md-4">
+                                        <a class="nav-link" href="#" id="t3_ScatterPlotMatrix_random">Random Sampling</a>
+                                    </li>
+                                    <li class="col-md-4">
+                                        <a class="nav-link" href="#" id="t3_ScatterPlotMatrix_stratified">Stratified Sampling</a>
+                                    </li>
+                                  </ul>
+                        
+                            <div class="col-md-12" id="r3c1">
+                                <svg width="500" height="700">
+            
+                                </svg>
+                            </div>
+                                        
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <script>
+            
+            var scatterPlotMatrix = false;
+
+            $('#task12').on('show.bs.collapse', function () {
+                //on clicking the accordion menu for task 1
+                call_task1_api();
+            });
+
+            $('#task31').on('show.bs.collapse', function () {
+                //on clicking the accordion menu for task 31
+                scatterPlotMatrix = false;
+                call_task3_api();
+            });
+
+
+            $('#task32').on('show.bs.collapse', function () {
+                //on clicking the accordion menu for task 32
+                scatterPlotMatrix = true;
+                call_task3_api();
+            });
+
+            var full_data;
+
+            function call_task1_api() {
+                $.ajax({
+                    type:"POST",//or POST
+                    url:'/api/generate_data',
+                    success:function(responsedata){
+                        // process on data
+                        full_data = JSON.parse(responsedata);
+                        console.log(full_data);
+                        
+                        // by default plot whole dataset
+                        plotGraph("whole_dataset");
+                    }
+                })
+            }
+
+            var scatterplot_data;
+
+            function call_task3_api() {
+                
+                $.ajax({
+                    type:"POST",//or POST
+                    url:'/api/scatterplot_data',
+                    success:function(responsedata){
+                        // process on data
+                        scatterplot_data = JSON.parse(responsedata);
+                        console.log(scatterplot_data);
+                        if (scatterPlotMatrix == true) {
+                            plotScatterPlotMatrix("whole_dataset");  
+                        } 
+                        else {
+                            // by default plot top 2 PCA scatterplot
+                            plotScatterPlot("whole_dataset", false, null);
+                            plotScatterPlot("random_sample", false, null);
+                            plotScatterPlot("stratified_sample", false, null);
+                        }
+                    }
+                })
+            }
+
+            // add onclick for tasl 1 nav bars and call graph function accordingly
+            document.getElementById("t1_whole_dataset").addEventListener("click", function() {
+                plotGraph("whole_dataset");
+            });
+ 
+            document.getElementById("t1_random_sample").addEventListener("click", function() {
+                plotGraph("random_sample");
+            });
+ 
+            document.getElementById("t1_stratified_sample").addEventListener("click", function() {
+                plotGraph("stratified_sample");
+            });
+
+            // add onclick for task 3 nav bars and call graph function accordingly
+            document.getElementById("t3_top_2_pca").addEventListener("click", function() {
+                plotScatterPlot("whole_dataset", false, null);
+                plotScatterPlot("random_sample", false, null);
+                plotScatterPlot("stratified_sample", false, null);
+            });
+ 
+            document.getElementById("t3_mds_euclidean").addEventListener("click", function() {
+                plotScatterPlot("whole_dataset", true, "euclidean");
+                plotScatterPlot("random_sample", true, "euclidean");
+                plotScatterPlot("stratified_sample", true, "euclidean");
+            });
+
+            document.getElementById("t3_mds_correlation").addEventListener("click", function() {
+                plotScatterPlot("whole_dataset", true, "correlation");
+                plotScatterPlot("random_sample", true, "correlation");
+                plotScatterPlot("stratified_sample", true, "correlation");
+            });
+ 
+            document.getElementById("t3_ScatterPlotMatrix_whole").addEventListener("click", function() {
+                plotScatterPlotMatrix("whole_dataset");
+            });
+
+            document.getElementById("t3_ScatterPlotMatrix_random").addEventListener("click", function() {
+                plotScatterPlotMatrix("random_sample");
+            });
+
+            document.getElementById("t3_ScatterPlotMatrix_stratified").addEventListener("click", function() {
+                plotScatterPlotMatrix("stratified_sample");
+            });
+
+            function plotGraph(data_type) {
+                
+                var data = full_data[data_type];
+
+                d3.select("#r1c1").selectAll("g").remove();
+
+                // add svg
+                var height = $("#r1c1").height();
+                var width = $("#r1c1").width();
+                // console.log(height, width);
+                
+                var svg = d3.select("#r1c1").select("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+                
+                svg.append("text")
+                    .attr("x", 270)
+                    .attr("y", 490)
+                    .attr("font-size", "0.7em")
+                    .text("PCA features");
+
+                svg.append("text")
+                    .attr("x", -290)
+                    .attr("y", 580)
+                    .attr("font-size", "0.7em")
+                    .attr("transform", "rotate(-90)")
+                    .text("Explained variance ratio");
+                
+                svg.append("text")
+                    .attr("x", -290)
+                    .attr("y", 50)
+                    .attr("font-size", "0.7em")
+                    .attr("transform", "rotate(-90)")
+                    .text("Explained variance");
+
+                var xAxis = d3.scaleBand().range([0, width]).padding(0.4),
+                    yAxis1 = d3.scaleLinear().range([height, 0]),
+                    yAxis2 = d3.scaleLinear().range([height, 0]);
+
+                var g = svg.append("g")
+                    .attr("transform", "translate(" + 90 + "," + 40 + ")" + " scale(" + 0.8 + ")");
+
+                var xDomain = [];
+                for (var i = 0; i < data.length; i++) {
+                    xDomain.push("feature "+ String(data[i]["feature"]));
+                }
+
+                xAxis.domain(xDomain);
+                yAxis1.domain([0, d3.max(data, function(d) { return +d.pca_variance })]).nice();
+                yAxis2.domain([0, 1]);
+
+                g.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(xAxis))
+                    .selectAll("text")	
+                            .style("text-anchor", "end")
+                            .attr("dx", "-.8em")
+                            .attr("dy", ".15em")
+                            .attr("transform", "rotate(-35)")
+                        .append("text");
+
+                g.append('g')
+                    .call(d3.axisLeft(yAxis1));
+                
+                g.append("g")
+                    .attr("transform", "translate( " + width + ", 0 )")
+                    .call(d3.axisRight(yAxis2));
+            
+                g.append("g")
+                    .selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", function(d) { return xAxis("feature "+ String(d.feature));})
+                    .attr("y", function(d) { return yAxis1(d.pca_variance);})
+                    .attr("width", xAxis.bandwidth())
+                    .attr("height", function(d) { return height - yAxis1(d.pca_variance); });
+
+                // Code for cumulative ratio curve and intrinsic dimensionality
+                var cum_data = full_data["cumulative_pca_variance_ratio"][data_type];
+                var intrinsic_dimensionality = full_data["intrinsic_dimensionality"][data_type];
+                console.log("Intrinsic dimensionality = ", intrinsic_dimensionality);
+
+                var curve = d3.line()
+                    .x(function(d) { return xAxis("feature "+ String(d.feature)); })
+                    .y(function(d) { return yAxis2(d.pca_variance_ratio); })
+                    .curve(d3.curveMonotoneX);
+
+                g.append("g")
+                    .append("path")
+                    .datum(cum_data) // Binds data to the line 
+                    .attr("class", "line")
+                    .attr("d", curve); 
+                
+                g.append("svg:line")
+                    .attr("x1", xAxis("feature "+ String(intrinsic_dimensionality - 1)) + xAxis.bandwidth() + xAxis.bandwidth()/3)
+                    .attr("y1", height)
+                    .attr("x2", xAxis("feature "+ String(intrinsic_dimensionality - 1)) + xAxis.bandwidth() + xAxis.bandwidth()/3)
+                    .attr("y2", 0)
+                    .style("stroke", "#000")
+                    .style("stroke-width", 2);
+
+            }
+
+            function plotScatterPlot(data_type, mds, distance) {
+                
+                var svg_id = "#r2c1";
+
+                if (data_type == "random_sample") {
+                    svg_id = "#r2c2";
+                }
+                else if (data_type == "stratified_sample") {
+                    svg_id = "#r2c3";
+                }
+
+                d3.select(svg_id).selectAll("g").remove();
+
+                var height = $(svg_id).height();
+                var width = $(svg_id).width();
+                // console.log(height, width);
+                
+                var svg = d3.select(svg_id).select("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+
+                svg.append("text")
+                    .attr("x", 150)
+                    .attr("y", 480)
+                    .attr("font-size", "0.7em")
+                    .text("Feature vector 1");
+                
+                if (data_type == "whole_dataset") {
+                    svg.append("text")
+                    .attr("x", 150)
+                    .attr("y", 495)
+                    .attr("font-size", "0.7em")
+                    .text("Whole Dataset");
+                }
+                else if (data_type == "random_sample") {
+                    svg.append("text")
+                    .attr("x", 150)
+                    .attr("y", 495)
+                    .attr("font-size", "0.7em")
+                    .text("Random Sample");
+                }
+                else {
+                    svg.append("text")
+                    .attr("x", 150)
+                    .attr("y", 495)
+                    .attr("font-size", "0.7em")
+                    .text("Stratified Sample");
+                }
+
+                var g = svg.append("g")
+                        .attr("transform", "translate(" + 55 + "," + 40 + ")" + " scale(" + 0.8 + ")");
+                
+                var x = d3.scaleLinear()
+                    .range([0, width]);
+
+                var y = d3.scaleLinear()
+                    .range([height, 0]);
+
+                var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                var xAxis = d3.axisBottom(x);
+
+                var yAxis = d3.axisLeft(y);
+
+                var data;
+                if (mds == true){
+                    
+                    data = scatterplot_data["mds"][distance][data_type];
+                    // console.log(data[0]);
+
+                    data.forEach(function(d) {
+                        d.MDS_1 = +d.MDS_1;
+                        d.MDS_2 = +d.MDS_2;
+                    });
+
+                    x.domain(d3.extent(data, function(d) { return d.MDS_1; })).nice();
+                    y.domain(d3.extent(data, function(d) { return d.MDS_2; })).nice();
+
+                    g.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(xAxis)
+                        .selectAll("text")	
+                            .style("text-anchor", "end")
+                            .attr("dx", "-.8em")
+                            .attr("dy", ".15em")
+                            .attr("transform", "rotate(-35)")
+                        .append("text")
+                        .attr("class", "label")
+                        .attr("y", -65)
+                        .attr("x", -200)
+                        .attr("dy", ".71em")
+                        .style("text-anchor", "end")
+                        .text("Feature vector 1");
+                        
+                    g.append("g")
+                        .attr("class", "y axis")
+                        .call(yAxis)
+                        .append("text")
+                        .attr("class", "label")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", -65)
+                        .attr("x", -200)
+                        .attr("dy", ".71em")
+                        .attr("stroke", "black")
+                        .style("text-anchor", "end")
+                        .text("Feature vector 2");
+                    
+                    g.selectAll(".dot")
+                        .data(data)
+                        .enter().append("circle")
+                        .attr("class", "dot")
+                        .attr("r", 3.5)
+                        .attr("cx", function(d) { return x(d.MDS_1); })
+                        .attr("cy", function(d) { return y(d.MDS_2); });
+                }
+                else {
+                    data = scatterplot_data["top_2_pca"][data_type];
+                    // console.log(data[0]);
+
+                    data.forEach(function(d) {
+                        d.PCA_1 = +d.PCA_1;
+                        d.PCA_2 = +d.PCA_2;
+                    });
+
+                    x.domain(d3.extent(data, function(d) { return d.PCA_1; })).nice();
+                    y.domain(d3.extent(data, function(d) { return d.PCA_2; })).nice();
+
+                    g.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(xAxis)
+                        .selectAll("text")	
+                            .style("text-anchor", "end")
+                            .attr("dx", "-.8em")
+                            .attr("dy", ".15em")
+                            .attr("transform", "rotate(-35)")
+                        .append("text")
+                        .attr("class", "label")
+                        .attr("x", width)
+                        .attr("y", -6)
+                        .style("text-anchor", "end")
+                        .text("Sepal Width (cm)");
+
+                    g.append("g")
+                        .attr("class", "y axis")
+                        .call(yAxis)
+                        .append("text")
+                        .attr("class", "label")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", -10)
+                        .attr("dy", ".71em")
+                        .style("text-anchor", "middle")
+                        .text("Sepal Length (cm)")
+
+                    g.selectAll(".dot")
+                        .data(data)
+                        .enter().append("circle")
+                        .attr("class", "dot")
+                        .attr("r", 3.5)
+                        .attr("cx", function(d) { return x(d.PCA_1); })
+                        .attr("cy", function(d) { return y(d.PCA_2); });
+                }
+                
+            }
+
+            // function for plotting a scatter plot
+            function plotScatterPlotMatrix(data_type) {
+                
+                var data = scatterplot_data["top_3_loaded_attributes"][data_type];
+
+                console.log(data);
+
+                var svg_id = "#r3c1";
+
+                d3.select(svg_id).selectAll("g").remove();
+
+                var height = $(svg_id).height() - 20;
+                var width = $(svg_id).width() - 20;
+                console.log(height, width);
+                
+                var size = 200,
+                    padding = 20;
+
+                var svg = d3.select(svg_id).select("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+
+                var g = svg.append("g")
+                    .attr("transform", "translate(" + 100 + "," + 40 + ")" + " scale(" + 0.8 + ")");
+
+                var x = d3.scaleLinear()
+                    .range([padding / 2, size - padding / 2]);
+
+                var y = d3.scaleLinear()
+                    .range([size - padding / 2, padding / 2]);
+
+                var xAxis = d3.axisBottom()
+                    .scale(x)
+                    .ticks(6);
+
+                var yAxis = d3.axisLeft()
+                    .scale(y)
+                    .ticks(6);
+
+
+                var domainByTrait = {},
+                    traits = d3.keys(data[0]),
+                    n = traits.length;
+
+                traits.forEach(function(trait) {
+                    domainByTrait[trait] = d3.extent(data, function(d) { 
+                        // console.log(trait, d[trait]);
+                        return d[trait]; });
+                    // console.log(domainByTrait[trait]);
+                });
+
+                console.log(traits);
+                console.log(domainByTrait);
+
+                xAxis.tickSize(size * n);
+                yAxis.tickSize(-size * n);
+
+                var brush = d3.brush()
+                    .on("start", brushstart)
+                    .on("brush", brushmove)
+                    .on("end", brushend)
+                    .extent([[0,0],[size,size]]);
+
+                g.selectAll(".x.axis")
+                    .data(traits)
+                    .enter().append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", function(d, i) { return "translate(" + (n - i - 1) * size + ",0)"; })
+                    .each(function(d) { x.domain(domainByTrait[d]); d3.select(this).call(xAxis); });
+
+                g.selectAll(".y.axis")
+                    .data(traits)
+                    .enter().append("g")
+                    .attr("class", "y axis")
+                    .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
+                    .each(function(d) { y.domain(domainByTrait[d]); d3.select(this).call(yAxis); });
+
+                var cell = g.selectAll(".cell")
+                    .data(cross(traits, traits))
+                    .enter().append("g")
+                    .attr("class", "cell")
+                    .attr("transform", function(d) { return "translate(" + (n - d.i - 1) * size + "," + d.j * size + ")"; })
+                    .each(plot);
+
+                // Titles for the diagonal.
+                cell.filter(function(d) { return d.i === d.j; }).append("text")
+                    .attr("x", padding)
+                    .attr("y", padding)
+                    .attr("dy", ".71em")
+                    .text(function(d) { return d.x; });
+
+                cell.call(brush);
+
+                function plot(p) {
+                    var cell = d3.select(this);
+
+                    x.domain(domainByTrait[p.x]);
+                    y.domain(domainByTrait[p.y]);
+
+                    cell.append("rect")
+                        .attr("class", "frame")
+                        .attr("x", padding / 2)
+                        .attr("y", padding / 2)
+                        .attr("width", size - padding)
+                        .attr("height", size - padding);
+
+                    cell.selectAll("circle")
+                        .data(data)
+                        .enter().append("circle")
+                        .attr("cx", function(d) { return x(d[p.x]); })
+                        .attr("cy", function(d) { return y(d[p.y]); })
+                        .attr("r", 4)
+                        .style("fill", "#69b3a2");
+                }
+
+                var brushCell;
+
+                // Clear the previously-active brush, if any.
+                function brushstart(p) {
+                    if (brushCell !== this) {
+                    d3.select(brushCell).call(brush.move, null);
+                    brushCell = this;
+                    x.domain(domainByTrait[p.x]);
+                    y.domain(domainByTrait[p.y]);
+                    }
+                }
+
+                // Highlight the selected circles.
+                function brushmove(p) {
+                    var e = d3.brushSelection(this);
+                    svg.selectAll("circle").classed("hidden", function(d) {
+                    return !e
+                        ? false
+                        : (
+                        e[0][0] > x(+d[p.x]) || x(+d[p.x]) > e[1][0]
+                        || e[0][1] > y(+d[p.y]) || y(+d[p.y]) > e[1][1]
+                        );
+                    });
+                }
+
+                // If the brush is empty, select all circles.
+                function brushend() {
+                    var e = d3.brushSelection(this);
+                    if (e === null) svg.selectAll(".hidden").classed("hidden", false);
+                }
+                // });
+
+                function cross(a, b) {
+                var c = [], n = a.length, m = b.length, i, j;
+                for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
+                return c;
+                }
+            }
+
+        </script>
+    </body>
+
+</html>
