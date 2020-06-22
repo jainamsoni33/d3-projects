@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+    <head>
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/bootstrap.min.css') }}">
+
+        <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='d3/d3.v4.min.js') }}"></script>
+
+        <!-- <link href="{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet"> -->
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/style.css') }}">
+    </head>
+    <title>
+        Deaths Dashboard
+    </title>
+
+    <body>
+        <div style="padding-left:5px; padding-right: 5px;"class="container-fluid h-100">
+            <nav style="padding-top:0%; padding-bottom: 0%;" class="navbar navbar-expand-lg navbar-light bg-light">
+                <span class="navbar-brand">The Annual Global Deaths Dashboard</span>
+
+                <form class="form-inline">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" onclick="setToDefault();">Reset Dashboard</button>
+                </form>
+                
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                      <!-- Navbar dd 1 -->
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown_year" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Year
+                        </a>
+                        <div id="years-dropdown-list" class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        </div>
+                      </li>
+                      <!-- Navbar dd 2 -->
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Countries
+                        </a>
+                        <ul id="countries-dropdown-list" class="dropdown-menu checkbox-menu dropdown-menu-right allow-focus" aria-labelledby="dropdownMenu1">
+                        </ul>
+                      </li>
+                      <!-- Navbar dd 3 -->
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Causes of Death
+                        </a>
+                        <ul id="causes-dropdown-list" class="dropdown-menu checkbox-menu dropdown-menu-right allow-focus" aria-labelledby="dropdownMenu2">
+                        </ul>
+                      </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="row" style="height: 350px;">
+
+                        <div class="col-md-7 border border-dark" id = "world_map_div">
+                            <!-- <svg id="world_map"></svg> -->
+                        </div>
+        
+                        <div class="col-md-5 border border-dark" id = "parallel_coordinates">
+                        </div>
+                    
+                        <!-- <div class="col-md-4 border border-dark" id = "hdi_test">
+                        </div> -->
+        
+                    </div>
+        
+                    <div class="row" style="height: 300px;">
+                        
+                        <div class="col-md-6 border border-dark" id = "scatterplot">
+                        </div>            
+        
+                        <div class="col-md-6 border border-dark" id = "barplot">
+                        </div>
+        
+                    </div>
+
+                </div>
+
+                <div class="col-md-2 border border-dark" id = "hdi_barplot">
+                </div>
+            </div>
+        
+        </div>
+
+        <script src="{{ url_for('static',filename='js/d3-scale-chromatic.v1.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/d3-geo-projection.v2.min.js') }}"></script>
+
+        <!-- Map Script -->
+        <script src="{{ url_for('static',filename='js/custom-js/map.js') }}"></script>
+
+        <!-- Bar Plot-->
+        <script src="{{ url_for('static',filename='js/custom-js/barplot.js') }}"></script>
+        
+        <!-- Barplot 2 Script -->
+        <script src="{{ url_for('static',filename='js/custom-js/hdi_barplot.js') }}"></script>
+
+        <!-- Scatterplot Script -->
+        <script src="{{ url_for('static',filename='js/custom-js/scatterplot.js') }}"></script>
+
+        <!-- Parallel Coordinates Script -->
+        <script src="{{ url_for('static',filename='js/custom-js/parallel.js') }}"></script>
+
+
+        <script>
+            var all_data = {{ returned_data.all_data | safe }}
+
+            var unique_years = new Set([]);
+            var unique_countries = new Set([]);
+            var all_causes = Object.keys(all_data[0]).slice(4,38);
+
+            all_data.forEach(element =>{
+                unique_countries.add(element["Country"]);
+                unique_years.add(element["Year"]);
+            });
+
+            unique_years = Array.from(unique_years).sort();
+
+            //default values
+            var selected_countries = new Set(["Albania", "Afghanistan", "Argentina"]);
+            var selected_causes = new Set(["Dementia (%)", "Cancers (%)", "Respiratory diseases (%)", "Diabetes (%)"]);
+            var year = 2016;
+            var colors = ['#FF1493', '#DB7093', '#7B68EE', '#CD5C5C', '#FF0000', '#FFA500', '#FFDAB9', '#7FFF00', '#00FF00', '#00FA9A', '#9ACD32', '#20B2AA', '#00FFFF', '#4682B4', '#0000FF', '#191970', '#BC8F8F', '#A0522D', '#778899', '#E9967A', '#D2B48C', '#BDB76B', '#FFA07A', '#DA70D6', '#9932CC', '#FFEFD5', '#4B0082', '#006400', '#ADFF2F', '#90EE90', '#FFDEAD', '#696969', '#FF69B4', '#556B2F', '#FFE4E1', '#8B008B', '#6B8E23', '#F5FFFA', '#FFFF00', '#6A5ACD', '#FFF0F5', '#8FBC8F', '#F4A460', '#FFFFF0', '#32CD32', '#DAA520', '#1E90FF', '#FFB6C1', '#EE82EE', '#808080', '#AFEEEE', '#FFFAF0', '#B22222', '#DEB887', '#F0E68C', '#D3D3D3', '#E0FFFF', '#DC143C', '#FFEBCD', '#CD853F', '#FDF5E6', '#3CB371', '#7FFFD4', '#F5F5DC', '#B8860B', '#FAEBD7', '#008B8B', '#4169E1', '#F8F8FF', '#EEE8AA', '#FFFAFA', '#8A2BE2', '#0000CD', '#000000', '#FFF8DC', '#D2691E', '#FF00FF', '#B0E0E6', '#FFC0CB', '#FA8072', '#48D1CC', '#8B4513', '#FFFACD', '#2F4F4F', '#B0C4DE', '#FFFFE0', '#40E0D0', '#FFD700', '#5F9EA0', '#6495ED', '#483D8B', '#A9A9A9', '#87CEFA', '#00CED1', '#00008B', '#FF8C00', '#00BFFF', '#FF7F50', '#8B0000', '#008000', '#66CDAA', '#F0FFF0', '#87CEEB', '#F0F8FF', '#9400D3', '#9370DB', '#FFE4B5', '#D8BFD8', '#DCDCDC', '#FF4500', '#F5DEB3', '#98FB98', '#FFF5EE', '#BA55D3', '#A52A2A', '#ADD8E6', '#808000', '#C0C0C0', '#FFFFFF', '#E6E6FA', '#2E8B57', 
+                          '#800000', '#00FF7F', '#7CFC00', '#FF6347', '#F08080', '#800080', '#708090', '#DDA0DD', '#F5F5F5', '#008080', '#FAFAD2', '#F0FFFF', '#FFE4C4', '#FAF0E6', '#000080', '#228B22', '#C71585']
+            var country_color_dict = {};
+            var colors_iterator = 0;
+
+            var data;
+
+            bring_selected_on_top();
+
+            function bring_selected_on_top(){
+                unique_years = unique_years.filter( (el) => el != year);
+
+                //adding year(2016) to the top (spread operator)
+                unique_years = [year, ...unique_years.sort()];
+
+                //clear old
+                d3.select("#years-dropdown-list")
+                .selectAll("a")
+                .remove();
+
+                //populate years
+                d3.select("#years-dropdown-list")
+                .selectAll("a")
+                .data(Array.from(unique_years))
+                .enter()
+                .append("a")
+                .text(function(d){
+                    return d;
+                })
+                .attr("value", function(d){
+                    return d;
+                })
+                .attr("onclick", function(d){
+                    return "get_year_data(" + d + ", 'dropdown')";
+                })
+                .attr("class", "dropdown-item")
+                .attr("id", "years-dropdown-item");
+
+                //populate countries, storing the checkboxes selected in a variable
+                var divs_countries = d3.select("#countries-dropdown-list")
+                .selectAll("li")
+                .data(Array.from(unique_countries))
+                .enter()
+                .append("li")
+                .append("label")
+                .text(function(d){
+                    return d;
+                })
+                .append("input")
+                .attr("type", "checkbox");
+
+                //populate causes, storing the checkboxes selected in a variable
+                var divs_causes = d3.select("#causes-dropdown-list")
+                .selectAll("li")
+                .data(Array.from(all_causes))
+                .enter()
+                .append("li")
+                .append("label")
+                .text(function(d){
+                    return d;
+                })
+                .append("input")
+                .attr("type", "checkbox");
+            }
+
+            $(document).on('click', '.allow-focus', function(e){
+                e.stopPropagation();
+            })
+
+            // for reset button
+            setToDefault();
+
+            function setToDefault(){
+                // default values
+                selected_countries = new Set(["Albania", "Afghanistan", "Argentina"]);
+                selected_causes = new Set(["Dementia (%)", "Cancers (%)", "Respiratory diseases (%)", "Diabetes (%)"]);
+                year = 2016;
+
+                // call the graphs
+                get_year_data(year, "dropdown");
+
+                //restore to default (these options should be checked box to true on clicking reset button)
+                update_actives();
+            }
+
+            function update_actives(){
+                
+                // set default active countries and causes
+                d3.select("#countries-dropdown-list")
+                .selectAll("li")
+                .classed("active", function(d){
+                    var selected_country = d3.select(this).select("label").text();
+                    if(selected_countries.has(selected_country))
+                    {
+                        d3.select(this).select("input").property("checked", true);
+                        if(!(selected_country in country_color_dict))
+                        {
+                            country_color_dict[selected_country] = colors[colors_iterator%colors.length];
+                            colors_iterator++;
+                        }
+                        return true;
+                    }
+                    else{
+                        d3.select(this).select("input").property('checked', false);
+                        return false;
+                    }
+                });
+
+                d3.select("#causes-dropdown-list")
+                .selectAll("li")
+                .classed("active", function(d){
+                    var selected_cause = d3.select(this).select("label").text();
+                    if(selected_causes.has(selected_cause))
+                    {
+                        d3.select(this).select("input").property("checked", true);
+                        return true;
+                    }
+                    else{
+                        d3.select(this).select("input").property('checked', false);
+                        return false;
+                    }
+                });
+            }
+
+            function on_update(update_coming_from)
+            {
+                bring_selected_on_top();
+                hdi_barplot(data);
+
+                if(update_coming_from == "dropdown")
+                {
+                    plotMap(data);
+                    plotScatterPlot(data);
+                    plotBarPlot(data);
+                    parallel_plot(data);
+                }
+                else if (update_coming_from == "scatter") {
+                    // console.log("scatter");
+                    plotMap(data);
+                    plotBarPlot(data);
+                    //parallel_plot(data);
+                }
+
+                else if (update_coming_from == "parallel") {
+                    // console.log("parallel");
+                    plotMap(data);
+                    plotScatterPlot(data);
+                    plotBarPlot(data);
+                }
+
+                else if (update_coming_from == "map") {
+                    // console.log("map");
+                    plotMap(data);
+                    plotBarPlot(data);
+                    parallel_plot(data);
+                    plotScatterPlot(data);
+                }
+
+                // toggle year on select
+                d3.select("#years-dropdown-list").selectAll("a")
+                    .classed("active", function (d) {
+                        if (d == year)
+                            return true;
+                        else
+                            return false;
+                });
+
+            }
+
+            $(".checkbox-menu").on("change", "input[type='checkbox']", function() {
+                // change checkbox color
+                $(this).closest("li").toggleClass("active", this.checked);
+                
+                selected_countries = new Set();
+                $.each($("#countries-dropdown-list li label"), function(){
+                    if ($(this).children()[0].checked)
+                    {
+                        var selected_country = $(this).text();
+                        selected_countries.add(selected_country);
+                        if (!(selected_country in country_color_dict)) {
+                            country_color_dict[selected_country] = colors[colors_iterator % colors.length];
+                            colors_iterator++;
+                        }
+                    }
+                });
+                selected_causes = new Set();
+                $.each($("#causes-dropdown-list li label"), function(){
+                    if ($(this).children()[0].checked)
+                    {
+                        selected_causes.add($(this).text());
+                    }
+                });
+
+                //call graph
+                get_year_data(year, "dropdown");
+            });
+
+            function get_year_data(f_year, update_coming_from)
+            {
+                year = f_year;
+
+                //after question mark all arguments
+                var url_string = "/dropdown?years=";
+                url_string += f_year;
+
+                selected_causes.forEach(element => url_string += "&causes=" + element);
+                selected_countries.forEach(element => url_string += "&countries=" + element);
+
+                //console.log(url_string)
+                $.ajax({
+                    url : url_string,
+                    success: function(response) {
+                        data = JSON.parse(response);
+                        on_update(update_coming_from);
+                    }
+                })
+            }
+
+        </script>
+    </body>
+</html>
